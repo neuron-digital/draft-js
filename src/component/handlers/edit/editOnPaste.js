@@ -88,12 +88,17 @@ function editOnPaste(editor: DraftEditor, e: SyntheticClipboardEvent): void {
   }
 
   let textBlocks: Array<string> = [];
-  const text = data.getText();
-  const html = data.getHTML();
+  let text = data.getText();
+  let html = data.getHTML();
+
+  const editPastedText = (newText, newHtml) => {
+    text = newText;
+    html = newHtml;
+  };
 
   if (
     editor.props.handlePastedText &&
-    isEventHandled(editor.props.handlePastedText(text, html))
+    isEventHandled(editor.props.handlePastedText(text, html, editPastedText))
   ) {
     return;
   }
