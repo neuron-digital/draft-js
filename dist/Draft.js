@@ -1,5 +1,5 @@
 /**
- * Draft v0.9.0
+ * Draft v0.10.0
  *
  * Copyright (c) 2013-present, Facebook, Inc.
  * All rights reserved.
@@ -9276,7 +9276,12 @@ var Draft =
 	  var text = data.getText();
 	  var html = data.getHTML();
 
-	  if (editor.props.handlePastedText && isEventHandled(editor.props.handlePastedText(text, html))) {
+	  var editPastedText = function editPastedText(newText, newHtml) {
+	    text = newText;
+	    html = newHtml;
+	  };
+
+	  if (editor.props.handlePastedText && isEventHandled(editor.props.handlePastedText(text, html, editPastedText))) {
 	    return;
 	  }
 
