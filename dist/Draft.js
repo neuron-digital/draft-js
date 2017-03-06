@@ -1812,15 +1812,8 @@ var Draft =
 /* 12 */
 /***/ function(module, exports) {
 
-	/*
-	object-assign
-	(c) Sindre Sorhus
-	@license MIT
-	*/
-
 	'use strict';
 	/* eslint-disable no-unused-vars */
-	var getOwnPropertySymbols = Object.getOwnPropertySymbols;
 	var hasOwnProperty = Object.prototype.hasOwnProperty;
 	var propIsEnumerable = Object.prototype.propertyIsEnumerable;
 
@@ -1841,7 +1834,7 @@ var Draft =
 			// Detect buggy property enumeration order in older V8 versions.
 
 			// https://bugs.chromium.org/p/v8/issues/detail?id=4118
-			var test1 = new String('abc');  // eslint-disable-line no-new-wrappers
+			var test1 = new String('abc');  // eslint-disable-line
 			test1[5] = 'de';
 			if (Object.getOwnPropertyNames(test1)[0] === '5') {
 				return false;
@@ -1870,7 +1863,7 @@ var Draft =
 			}
 
 			return true;
-		} catch (err) {
+		} catch (e) {
 			// We don't expect any of the above to throw, but better to be safe.
 			return false;
 		}
@@ -1890,8 +1883,8 @@ var Draft =
 				}
 			}
 
-			if (getOwnPropertySymbols) {
-				symbols = getOwnPropertySymbols(from);
+			if (Object.getOwnPropertySymbols) {
+				symbols = Object.getOwnPropertySymbols(from);
 				for (var i = 0; i < symbols.length; i++) {
 					if (propIsEnumerable.call(from, symbols[i])) {
 						to[symbols[i]] = from[symbols[i]];
@@ -3961,35 +3954,37 @@ var Draft =
 	  if (styleToCheck) {
 	    currentStyle = currentStyle.add(styleToCheck).toOrderedSet();
 	  } else if (node instanceof HTMLElement) {
-	    var htmlElement = node;
-	    currentStyle = currentStyle.withMutations(function (style) {
-	      var fontWeight = htmlElement.style.fontWeight;
-	      var fontStyle = htmlElement.style.fontStyle;
-	      var textDecoration = htmlElement.style.textDecoration;
+	    (function () {
+	      var htmlElement = node;
+	      currentStyle = currentStyle.withMutations(function (style) {
+	        var fontWeight = htmlElement.style.fontWeight;
+	        var fontStyle = htmlElement.style.fontStyle;
+	        var textDecoration = htmlElement.style.textDecoration;
 
-	      if (boldValues.indexOf(fontWeight) >= 0) {
-	        style.add('BOLD');
-	      } else if (notBoldValues.indexOf(fontWeight) >= 0) {
-	        style.remove('BOLD');
-	      }
+	        if (boldValues.indexOf(fontWeight) >= 0) {
+	          style.add('BOLD');
+	        } else if (notBoldValues.indexOf(fontWeight) >= 0) {
+	          style.remove('BOLD');
+	        }
 
-	      if (fontStyle === 'italic') {
-	        style.add('ITALIC');
-	      } else if (fontStyle === 'normal') {
-	        style.remove('ITALIC');
-	      }
+	        if (fontStyle === 'italic') {
+	          style.add('ITALIC');
+	        } else if (fontStyle === 'normal') {
+	          style.remove('ITALIC');
+	        }
 
-	      if (textDecoration === 'underline') {
-	        style.add('UNDERLINE');
-	      }
-	      if (textDecoration === 'line-through') {
-	        style.add('STRIKETHROUGH');
-	      }
-	      if (textDecoration === 'none') {
-	        style.remove('UNDERLINE');
-	        style.remove('STRIKETHROUGH');
-	      }
-	    }).toOrderedSet();
+	        if (textDecoration === 'underline') {
+	          style.add('UNDERLINE');
+	        }
+	        if (textDecoration === 'line-through') {
+	          style.add('STRIKETHROUGH');
+	        }
+	        if (textDecoration === 'none') {
+	          style.remove('UNDERLINE');
+	          style.remove('STRIKETHROUGH');
+	        }
+	      }).toOrderedSet();
+	    })();
 	  }
 	  return currentStyle;
 	}
@@ -4054,7 +4049,8 @@ var Draft =
 	  if (nodeName === '#text') {
 	    var text = node.textContent;
 	    if (text.trim() === '' && inBlock !== 'pre') {
-	      if (!inBlock && !node.previousSibling) {
+	      // whitespace after body or html comment
+	      if (!inBlock && (!node.previousSibling || node.previousSibling.nodeName === '#comment')) {
 	        return { chunk: getEmptyChunk(), entityMap: entityMap };
 	      }
 	      return { chunk: getWhitespaceChunk(inEntity), entityMap: entityMap };
@@ -4091,20 +4087,22 @@ var Draft =
 
 	  // IMG tags
 	  if (nodeName === 'img' && node instanceof HTMLImageElement && node.attributes.getNamedItem('src') && node.attributes.getNamedItem('src').value) {
-	    var image = node;
-	    var entityConfig = {};
+	    (function () {
+	      var image = node;
+	      var entityConfig = {};
 
-	    imgAttr.forEach(function (attr) {
-	      var imageAttribute = image.getAttribute(attr);
-	      if (imageAttribute) {
-	        entityConfig[attr] = imageAttribute;
-	      }
-	    });
-	    var imageURI = new URI(entityConfig.src).toString();
-	    node.textContent = imageURI; // Output src if no decorator
+	      imgAttr.forEach(function (attr) {
+	        var imageAttribute = image.getAttribute(attr);
+	        if (imageAttribute) {
+	          entityConfig[attr] = imageAttribute;
+	        }
+	      });
+	      var imageURI = new URI(entityConfig.src).toString();
+	      node.textContent = imageURI; // Output src if no decorator
 
-	    // TODO: update this when we remove DraftEntity entirely
-	    inEntity = DraftEntity.__create('IMAGE', 'MUTABLE', entityConfig || {});
+	      // TODO: update this when we remove DraftEntity entirely
+	      inEntity = DraftEntity.__create('IMAGE', 'MUTABLE', entityConfig || {});
+	    })();
 	  }
 
 	  var chunk = getEmptyChunk();
