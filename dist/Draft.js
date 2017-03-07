@@ -4248,7 +4248,7 @@ var Draft =
 	function convertFromHTMLtoContentBlocks(html) {
 	  var DOMBuilder = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : getSafeBodyFromHTML;
 	  var blockRenderMap = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : DefaultDraftBlockRenderMap;
-	  var allowedStyles = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : [];
+	  var allowedStyles = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : List();
 	  var allowLinks = arguments[4];
 
 	  // Be ABSOLUTELY SURE that the dom builder you pass here won't execute
@@ -6074,7 +6074,7 @@ var Draft =
 
 /***/ },
 /* 62 */
-/***/ function(module, exports) {
+/***/ function(module, exports, __webpack_require__) {
 
 	/**
 	 * Copyright (c) 2013-present, Facebook, Inc.
@@ -6090,9 +6090,11 @@ var Draft =
 
 	'use strict';
 
+	var _immutable = __webpack_require__(2);
+
 	var DefaultDraftPasteSupport = {
-	  inlineStyles: ['BOLD', 'CODE', 'ITALIC', 'STRIKETHROUGH', 'UNDERLINE'],
-	  blockTypes: ['header-one', 'header-two', 'header-three', 'header-four', 'header-five', 'header-six', 'unordered-list-item', 'ordered-list-item', 'blockquote', 'atomic', 'code-block', 'unstyled'],
+	  inlineStyles: (0, _immutable.List)(['BOLD', 'CODE', 'ITALIC', 'STRIKETHROUGH', 'UNDERLINE']),
+	  blockTypes: (0, _immutable.List)(['header-one', 'header-two', 'header-three', 'header-four', 'header-five', 'header-six', 'unordered-list-item', 'ordered-list-item', 'blockquote', 'atomic', 'code-block', 'unstyled']),
 	  links: true
 	};
 

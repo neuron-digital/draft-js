@@ -182,7 +182,7 @@ function getBlockTypeForTag(tag: string, lastList: ?string, blockRenderMap: Draf
   }
 }
 
-function processInlineTag(tag: string, node: Node, currentStyle: DraftInlineStyle, allowedStyles: Array<string>): DraftInlineStyle {
+function processInlineTag(tag: string, node: Node, currentStyle: DraftInlineStyle, allowedStyles: List<string>): DraftInlineStyle {
   var styleToCheck = inlineTags[tag];
   if (styleToCheck && allowedStyles.includes(styleToCheck)) {
     currentStyle = currentStyle.add(styleToCheck).toOrderedSet();
@@ -267,7 +267,7 @@ function hasValidLinkText(link: Node): boolean {
   return protocol === 'http:' || protocol === 'https:' || protocol === 'mailto:';
 }
 
-function genFragment(entityMap: EntityMap, node: Node, inlineStyle: DraftInlineStyle, lastList: string, inBlock: ?string, blockTags: Array<string>, depth: number, blockRenderMap: DraftBlockRenderMap, allowedStyles: Array<string>, allowLinks: boolean, inEntity?: string): { chunk: Chunk; entityMap: EntityMap; } {
+function genFragment(entityMap: EntityMap, node: Node, inlineStyle: DraftInlineStyle, lastList: string, inBlock: ?string, blockTags: Array<string>, depth: number, blockRenderMap: DraftBlockRenderMap, allowedStyles: List<string>, allowLinks: boolean, inEntity?: string): { chunk: Chunk; entityMap: EntityMap; } {
   var nodeName = node.nodeName.toLowerCase();
   var newBlock = false;
   var nextBlockType = 'unstyled';
@@ -410,7 +410,7 @@ function genFragment(entityMap: EntityMap, node: Node, inlineStyle: DraftInlineS
   return { chunk, entityMap: newEntityMap };
 }
 
-function getChunkForHTML(html: string, DOMBuilder: Function, blockRenderMap: DraftBlockRenderMap, entityMap: EntityMap, allowedStyles: Array<string>, allowLinks: boolean): ?{ chunk: Chunk; entityMap: EntityMap; } {
+function getChunkForHTML(html: string, DOMBuilder: Function, blockRenderMap: DraftBlockRenderMap, entityMap: EntityMap, allowedStyles: List<string>, allowLinks: boolean): ?{ chunk: Chunk; entityMap: EntityMap; } {
   html = html.trim().replace(REGEX_CR, '').replace(REGEX_NBSP, SPACE).replace(REGEX_CARRIAGE, '').replace(REGEX_ZWS, '');
 
   const supportedBlockTags = getBlockMapSupportedTags(blockRenderMap);
@@ -466,7 +466,7 @@ function getChunkForHTML(html: string, DOMBuilder: Function, blockRenderMap: Dra
   return { chunk, entityMap: newEntityMap };
 }
 
-function convertFromHTMLtoContentBlocks(html: string, DOMBuilder: Function = getSafeBodyFromHTML, blockRenderMap?: DraftBlockRenderMap = DefaultDraftBlockRenderMap, allowedStyles: Array<string> = [], allowLinks: boolean): ?{ contentBlocks: ?Array<ContentBlock>; entityMap: EntityMap; } {
+function convertFromHTMLtoContentBlocks(html: string, DOMBuilder: Function = getSafeBodyFromHTML, blockRenderMap?: DraftBlockRenderMap = DefaultDraftBlockRenderMap, allowedStyles: List<string> = List(), allowLinks: boolean): ?{ contentBlocks: ?Array<ContentBlock>; entityMap: EntityMap; } {
   // Be ABSOLUTELY SURE that the dom builder you pass here won't execute
   // arbitrary code in whatever environment you're running this in. For an
   // example of how we try to do this in-browser, see getSafeBodyFromHTML.
