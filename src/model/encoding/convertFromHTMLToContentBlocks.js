@@ -340,6 +340,7 @@ function genFragment(
   depth: number,
   blockRenderMap: DraftBlockRenderMap,
   allowedStyles: List<string>,
+  allowImages: boolean,
   allowLinks: boolean,
   inEntity?: string
 ): {chunk: Chunk, entityMap: EntityMap} {
@@ -397,6 +398,7 @@ function genFragment(
 
   // IMG tags
   if (
+    allowImages &&
     nodeName === 'img' &&
     node instanceof HTMLImageElement &&
     node.attributes.getNamedItem('src') &&
@@ -502,6 +504,7 @@ function genFragment(
       depth,
       blockRenderMap,
       allowedStyles,
+      allowImages,
       allowLinks,
       entityId || inEntity
     );
@@ -542,6 +545,7 @@ function getChunkForHTML(
   blockRenderMap: DraftBlockRenderMap,
   entityMap: EntityMap,
   allowedStyles: List<string>,
+  allowImages: boolean,
   allowLinks: boolean,
 ): ?{chunk: Chunk, entityMap: EntityMap} {
   html = html
@@ -581,6 +585,7 @@ function getChunkForHTML(
     -1,
     blockRenderMap,
     allowedStyles,
+    allowImages,
     allowLinks
   );
 
@@ -623,6 +628,7 @@ function convertFromHTMLtoContentBlocks(
   DOMBuilder: Function = getSafeBodyFromHTML,
   blockRenderMap?: DraftBlockRenderMap = DefaultDraftBlockRenderMap,
   allowedStyles: List<string> = List(),
+  allowImages: boolean,
   allowLinks: boolean,
 ): ?{contentBlocks: ?Array<ContentBlock>, entityMap: EntityMap} {
   // Be ABSOLUTELY SURE that the dom builder you pass here won't execute
@@ -636,6 +642,7 @@ function convertFromHTMLtoContentBlocks(
     blockRenderMap,
     DraftEntity,
     allowedStyles,
+    allowImages,
     allowLinks
   );
 

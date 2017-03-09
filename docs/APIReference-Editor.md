@@ -121,22 +121,12 @@ Default is `false`.
 
 #### pasteSupport
 ```
-stripPastedStyles?: Object
+pasteSupport?: Object
 ```
-Optionally define which inline styles, block types and links should be retained on paste.
-
-If your use case should not have any blocks, inline styles and links, set this to
-```
-{
-  inlineStyles: List()
-  blockTypes: List(),
-  links: false,
-}
-```
-
-This should be used if your editor does not support rich styles.
-
-Default is `false`.
+Optionally define which inline styles and block types should be retained on
+paste, and what to strip:
+  - images
+  - links
 
 ### DOM and Accessibility (Optional)
 
