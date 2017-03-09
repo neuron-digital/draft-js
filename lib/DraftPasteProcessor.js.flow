@@ -31,8 +31,8 @@ const {
 } = Immutable;
 
 const DraftPasteProcessor = {
-  processHTML(html: string, blockRenderMap?: DraftBlockRenderMap, allowedStyles: List<string>, allowLinks: boolean): ?{ contentBlocks: ?Array<ContentBlock>; entityMap: EntityMap; } {
-    return convertFromHTMLtoContentBlocks(html, getSafeBodyFromHTML, blockRenderMap, allowedStyles, allowLinks);
+  processHTML(html: string, blockRenderMap?: DraftBlockRenderMap, allowedStyles: List<string>, allowImages: boolean, allowLinks: boolean): ?{ contentBlocks: ?Array<ContentBlock>; entityMap: EntityMap; } {
+    return convertFromHTMLtoContentBlocks(html, getSafeBodyFromHTML, blockRenderMap, allowedStyles, allowImages, allowLinks);
   },
 
   processText(textBlocks: Array<string>, character: CharacterMetadata): Array<ContentBlock> {

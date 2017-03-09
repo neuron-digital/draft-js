@@ -267,7 +267,7 @@ function hasValidLinkText(link: Node): boolean {
   return protocol === 'http:' || protocol === 'https:' || protocol === 'mailto:';
 }
 
-function genFragment(entityMap: EntityMap, node: Node, inlineStyle: DraftInlineStyle, lastList: string, inBlock: ?string, blockTags: Array<string>, depth: number, blockRenderMap: DraftBlockRenderMap, allowedStyles: List<string>, allowLinks: boolean, inEntity?: string): { chunk: Chunk; entityMap: EntityMap; } {
+function genFragment(entityMap: EntityMap, node: Node, inlineStyle: DraftInlineStyle, lastList: string, inBlock: ?string, blockTags: Array<string>, depth: number, blockRenderMap: DraftBlockRenderMap, allowedStyles: List<string>, allowImages: boolean, allowLinks: boolean, inEntity?: string): { chunk: Chunk; entityMap: EntityMap; } {
   var nodeName = node.nodeName.toLowerCase();
   var newBlock = false;
   var nextBlockType = 'unstyled';
@@ -315,7 +315,7 @@ function genFragment(entityMap: EntityMap, node: Node, inlineStyle: DraftInlineS
   }
 
   // IMG tags
-  if (nodeName === 'img' && node instanceof HTMLImageElement && node.attributes.getNamedItem('src') && node.attributes.getNamedItem('src').value) {
+  if (allowImages && nodeName === 'img' && node instanceof HTMLImageElement && node.attributes.getNamedItem('src') && node.attributes.getNamedItem('src').value) {
     const image: HTMLImageElement = node;
     const entityConfig = {};
 
@@ -385,7 +385,7 @@ function genFragment(entityMap: EntityMap, node: Node, inlineStyle: DraftInlineS
       entityId = undefined;
     }
 
-    const { chunk: generatedChunk, entityMap: maybeUpdatedEntityMap } = genFragment(newEntityMap, child, inlineStyle, lastList, inBlock, blockTags, depth, blockRenderMap, allowedStyles, allowLinks, entityId || inEntity);
+    const { chunk: generatedChunk, entityMap: maybeUpdatedEntityMap } = genFragment(newEntityMap, child, inlineStyle, lastList, inBlock, blockTags, depth, blockRenderMap, allowedStyles, allowImages, allowLinks, entityId || inEntity);
 
     newChunk = generatedChunk;
     newEntityMap = maybeUpdatedEntityMap;
@@ -410,7 +410,7 @@ function genFragment(entityMap: EntityMap, node: Node, inlineStyle: DraftInlineS
   return { chunk, entityMap: newEntityMap };
 }
 
-function getChunkForHTML(html: string, DOMBuilder: Function, blockRenderMap: DraftBlockRenderMap, entityMap: EntityMap, allowedStyles: List<string>, allowLinks: boolean): ?{ chunk: Chunk; entityMap: EntityMap; } {
+function getChunkForHTML(html: string, DOMBuilder: Function, blockRenderMap: DraftBlockRenderMap, entityMap: EntityMap, allowedStyles: List<string>, allowImages: boolean, allowLinks: boolean): ?{ chunk: Chunk; entityMap: EntityMap; } {
   html = html.trim().replace(REGEX_CR, '').replace(REGEX_NBSP, SPACE).replace(REGEX_CARRIAGE, '').replace(REGEX_ZWS, '');
 
   const supportedBlockTags = getBlockMapSupportedTags(blockRenderMap);
@@ -431,7 +431,7 @@ function getChunkForHTML(html: string, DOMBuilder: Function, blockRenderMap: Dra
   var {
     chunk,
     entityMap: newEntityMap
-  } = genFragment(entityMap, safeBody, OrderedSet(), 'ul', null, workingBlocks, -1, blockRenderMap, allowedStyles, allowLinks);
+  } = genFragment(entityMap, safeBody, OrderedSet(), 'ul', null, workingBlocks, -1, blockRenderMap, allowedStyles, allowImages, allowLinks);
 
   // join with previous block to prevent weirdness on paste
   if (chunk.text.indexOf('\r') === 0) {
@@ -466,13 +466,13 @@ function getChunkForHTML(html: string, DOMBuilder: Function, blockRenderMap: Dra
   return { chunk, entityMap: newEntityMap };
 }
 
-function convertFromHTMLtoContentBlocks(html: string, DOMBuilder: Function = getSafeBodyFromHTML, blockRenderMap?: DraftBlockRenderMap = DefaultDraftBlockRenderMap, allowedStyles: List<string> = List(), allowLinks: boolean): ?{ contentBlocks: ?Array<ContentBlock>; entityMap: EntityMap; } {
+function convertFromHTMLtoContentBlocks(html: string, DOMBuilder: Function = getSafeBodyFromHTML, blockRenderMap?: DraftBlockRenderMap = DefaultDraftBlockRenderMap, allowedStyles: List<string> = List(), allowImages: boolean, allowLinks: boolean): ?{ contentBlocks: ?Array<ContentBlock>; entityMap: EntityMap; } {
   // Be ABSOLUTELY SURE that the dom builder you pass here won't execute
   // arbitrary code in whatever environment you're running this in. For an
   // example of how we try to do this in-browser, see getSafeBodyFromHTML.
 
   // TODO: replace DraftEntity with an OrderedMap here
-  var chunkData = getChunkForHTML(html, DOMBuilder, blockRenderMap, DraftEntity, allowedStyles, allowLinks);
+  var chunkData = getChunkForHTML(html, DOMBuilder, blockRenderMap, DraftEntity, allowedStyles, allowImages, allowLinks);
 
   if (chunkData == null) {
     return null;
