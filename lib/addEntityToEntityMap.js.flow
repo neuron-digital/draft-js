@@ -21,7 +21,7 @@ import type { OrderedMap } from 'immutable';
 let key = 0;
 
 function addEntityToEntityMap(entityMap: OrderedMap<*, *>, instance: DraftEntityInstance): OrderedMap<*, *> {
-  return entityMap.set(`${ ++key }`, instance);
+  return entityMap.set(`${++key}`, instance);
 }
 
 module.exports = addEntityToEntityMap;
