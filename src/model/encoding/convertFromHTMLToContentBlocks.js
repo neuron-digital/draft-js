@@ -68,6 +68,8 @@ var inlineTags = {
   strike: 'STRIKETHROUGH',
   strong: 'BOLD',
   u: 'UNDERLINE',
+  sub: 'SUBSCRIPT',
+  sup: 'SUPERSCRIPT',
 };
 
 var anchorAttr = [

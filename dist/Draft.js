@@ -3878,7 +3878,9 @@ var Draft =
 	  s: 'STRIKETHROUGH',
 	  strike: 'STRIKETHROUGH',
 	  strong: 'BOLD',
-	  u: 'UNDERLINE'
+	  u: 'UNDERLINE',
+	  sub: 'SUBSCRIPT',
+	  sup: 'SUPERSCRIPT'
 	};
 
 	var anchorAttr = ['className', 'href', 'rel', 'target', 'title'];
