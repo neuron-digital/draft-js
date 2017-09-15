@@ -242,17 +242,22 @@ function processInlineTag(
       const fontWeight = htmlElement.style.fontWeight;
       const fontStyle = htmlElement.style.fontStyle;
       const textDecoration = htmlElement.style.textDecoration;
+      const verticalAlign = htmlElement.style.verticalAlign;
 
-      if (allowedStyles.includes('BOLD') && boldValues.indexOf(fontWeight) >= 0) {
-        style.add('BOLD');
-      } else if (notBoldValues.indexOf(fontWeight) >= 0) {
-        style.remove('BOLD');
+      if (allowedStyles.includes('BOLD')) {
+        if (boldValues.indexOf(fontWeight) >= 0) {
+          style.add('BOLD');
+        } else if (notBoldValues.indexOf(fontWeight) >= 0) {
+          style.remove('BOLD');
+        }
       }
 
-      if (allowedStyles.includes('ITALIC') && fontStyle === 'italic') {
-        style.add('ITALIC');
-      } else if (fontStyle === 'normal') {
-        style.remove('ITALIC');
+      if (allowedStyles.includes('ITALIC')) {
+        if (fontStyle === 'italic') {
+          style.add('ITALIC');
+        } else if (fontStyle === 'normal') {
+          style.remove('ITALIC');
+        }
       }
 
       if (allowedStyles.includes('UNDERLINE') && textDecoration === 'underline') {
@@ -264,6 +269,22 @@ function processInlineTag(
       if (textDecoration === 'none') {
         style.remove('UNDERLINE');
         style.remove('STRIKETHROUGH');
+      }
+
+      if (allowedStyles.includes('SUBSCRIPT')) {
+        if (verticalAlign === 'sub') {
+          style.add('SUBSCRIPT');
+        } else if (verticalAlign && verticalAlign !== 'sub') {
+          style.remove('SUBSCRIPT');
+        }
+      }
+
+      if (allowedStyles.includes('SUPERSCRIPT')) {
+        if (verticalAlign === 'super') {
+          style.add('SUPERSCRIPT');
+        } else if (verticalAlign && verticalAlign !== 'super') {
+          style.remove('SUPERSCRIPT');
+        }
       }
     }).toOrderedSet();
   }
