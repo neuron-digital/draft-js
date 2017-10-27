@@ -211,9 +211,10 @@ function processInlineTag(
   tag: string,
   node: Node,
   currentStyle: DraftInlineStyle,
+  allowedStyles: List<string>,
 ): DraftInlineStyle {
   var styleToCheck = inlineTags[tag];
-  if (styleToCheck) {
+  if (styleToCheck && allowedStyles.includes(styleToCheck)) {
     currentStyle = currentStyle.add(styleToCheck).toOrderedSet();
   } else if (node instanceof HTMLElement) {
     const htmlElement = node;
@@ -223,22 +224,31 @@ function processInlineTag(
         const fontStyle = htmlElement.style.fontStyle;
         const textDecoration = htmlElement.style.textDecoration;
 
-        if (boldValues.indexOf(fontWeight) >= 0) {
+        if (
+          allowedStyles.includes('BOLD') &&
+          boldValues.indexOf(fontWeight) >= 0
+        ) {
           style.add('BOLD');
         } else if (notBoldValues.indexOf(fontWeight) >= 0) {
           style.remove('BOLD');
         }
 
-        if (fontStyle === 'italic') {
+        if (allowedStyles.includes('ITALIC') && fontStyle === 'italic') {
           style.add('ITALIC');
         } else if (fontStyle === 'normal') {
           style.remove('ITALIC');
         }
 
-        if (textDecoration === 'underline') {
+        if (
+          allowedStyles.includes('UNDERLINE') &&
+          textDecoration === 'underline'
+        ) {
           style.add('UNDERLINE');
         }
-        if (textDecoration === 'line-through') {
+        if (
+          allowedStyles.includes('STRIKETHROUGH') &&
+          textDecoration === 'line-through'
+        ) {
           style.add('STRIKETHROUGH');
         }
         if (textDecoration === 'none') {
@@ -315,6 +325,9 @@ function genFragment(
   blockTags: Array<string>,
   depth: number,
   blockRenderMap: DraftBlockRenderMap,
+  allowedStyles: List<string>,
+  allowImages: boolean,
+  allowLinks: boolean,
   inEntity?: string,
 ): {chunk: Chunk, entityMap: EntityMap} {
   var nodeName = node.nodeName.toLowerCase();
@@ -376,6 +389,7 @@ function genFragment(
 
   // IMG tags
   if (
+    allowImages &&
     nodeName === 'img' &&
     node instanceof HTMLImageElement &&
     node.attributes.getNamedItem('src') &&
@@ -405,7 +419,7 @@ function genFragment(
   var newChunk: ?Chunk = null;
 
   // Inline tags
-  inlineStyle = processInlineTag(nodeName, node, inlineStyle);
+  inlineStyle = processInlineTag(nodeName, node, inlineStyle, allowedStyles);
 
   // Handle lists
   if (nodeName === 'ul' || nodeName === 'ol') {
@@ -444,6 +458,7 @@ function genFragment(
 
   while (child) {
     if (
+      allowLinks &&
       child instanceof HTMLAnchorElement &&
       child.href &&
       hasValidLinkText(child)
@@ -477,6 +492,9 @@ function genFragment(
       blockTags,
       depth,
       blockRenderMap,
+      allowedStyles,
+      allowImages,
+      allowLinks,
       entityId || inEntity,
     );
 
@@ -508,6 +526,9 @@ function getChunkForHTML(
   DOMBuilder: Function,
   blockRenderMap: DraftBlockRenderMap,
   entityMap: EntityMap,
+  allowedStyles: List<string>,
+  allowImages: boolean,
+  allowLinks: boolean,
 ): ?{chunk: Chunk, entityMap: EntityMap} {
   html = html
     .trim()
@@ -542,6 +563,9 @@ function getChunkForHTML(
     workingBlocks,
     -1,
     blockRenderMap,
+    allowedStyles,
+    allowImages,
+    allowLinks,
   );
 
   // join with previous block to prevent weirdness on paste
@@ -581,6 +605,9 @@ function convertFromHTMLtoContentBlocks(
   html: string,
   DOMBuilder: Function = getSafeBodyFromHTML,
   blockRenderMap?: DraftBlockRenderMap = DefaultDraftBlockRenderMap,
+  allowedStyles: List<string> = List(),
+  allowImages: boolean,
+  allowLinks: boolean,
 ): ?{contentBlocks: ?Array<ContentBlock>, entityMap: EntityMap} {
   // Be ABSOLUTELY SURE that the dom builder you pass here won't execute
   // arbitrary code in whatever environment you're running this in. For an
@@ -592,6 +619,9 @@ function convertFromHTMLtoContentBlocks(
     DOMBuilder,
     blockRenderMap,
     DraftEntity,
+    allowedStyles,
+    allowImages,
+    allowLinks,
   );
 
   if (chunkData == null) {
