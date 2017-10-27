@@ -8,10 +8,16 @@
  *
  * @providesModule ContentState
  * @typechecks
+ * @format
  * @flow
  */
 
 'use strict';
+
+import type { BlockMap } from './BlockMap';
+import type DraftEntityInstance from './DraftEntityInstance';
+import type { DraftEntityMutability } from './DraftEntityMutability';
+import type { DraftEntityType } from './DraftEntityType';
 
 const BlockMapBuilder = require('./BlockMapBuilder');
 const CharacterMetadata = require('./CharacterMetadata');
@@ -22,11 +28,6 @@ const SelectionState = require('./SelectionState');
 
 const generateRandomKey = require('./generateRandomKey');
 const sanitizeDraftText = require('./sanitizeDraftText');
-
-import type { BlockMap } from './BlockMap';
-import type DraftEntityInstance from './DraftEntityInstance';
-import type { DraftEntityMutability } from './DraftEntityMutability';
-import type { DraftEntityType } from './DraftEntityType';
 
 const { List, Record, Repeat } = Immutable;
 
@@ -45,7 +46,6 @@ const defaultRecord: {
 const ContentStateRecord = Record(defaultRecord);
 
 class ContentState extends ContentStateRecord {
-
   getEntityMap(): any {
     // TODO: update this when we fully remove DraftEntity
     return DraftEntity;
